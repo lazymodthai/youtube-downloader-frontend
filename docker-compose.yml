@@ -1,0 +1,18 @@
+services:
+  frontend-vite:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: youtube-downloader-frontend
+    ports:
+      - "8088:5173"
+    environment:
+      # backend service name จากอีก compose
+      VITE_API_URL: http://youtube-downloader-backend:4000
+    networks:
+      - myapp-network
+    restart: unless-stopped
+
+networks:
+  myapp-network:
+    external: true
