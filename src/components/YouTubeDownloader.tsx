@@ -428,7 +428,7 @@ const YouTubeDownloader: React.FC = () => {
 
       {/* Info Cards */}
       <Grid container spacing={3}>
-        <Grid size={12}>
+        <Grid size={6}>
           <Paper elevation={2} sx={{ p: 3, textAlign: 'center', height: '100%' }}>
             <VideoFileIcon sx={{ fontSize: 48, color: 'error.main', mb: 2 }} />
             <Typography variant="h6" gutterBottom fontWeight="bold">
@@ -439,7 +439,7 @@ const YouTubeDownloader: React.FC = () => {
             </Typography>
           </Paper>
         </Grid>
-        <Grid size={12}>
+        <Grid size={6}>
           <Paper elevation={2} sx={{ p: 3, textAlign: 'center', height: '100%' }}>
             <FlashOnIcon sx={{ fontSize: 48, color: 'secondary.main', mb: 2 }} />
             <Typography variant="h6" gutterBottom fontWeight="bold">
@@ -450,7 +450,7 @@ const YouTubeDownloader: React.FC = () => {
             </Typography>
           </Paper>
         </Grid>
-        <Grid size={12}>
+        <Grid size={6}>
           <Paper elevation={2} sx={{ p: 3, textAlign: 'center', height: '100%' }}>
             <AudioFileIcon sx={{ fontSize: 48, color: 'info.main', mb: 2 }} />
             <Typography variant="h6" gutterBottom fontWeight="bold">
@@ -458,6 +458,17 @@ const YouTubeDownloader: React.FC = () => {
             </Typography>
             <Typography variant="body2" color="text.secondary">
               ดาวน์โหลดเฉพาะเสียง
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid size={6}>
+          <Paper elevation={2} sx={{ p: 3, textAlign: 'center', height: '100%' }}>
+            <AutoAwesomeIcon sx={{ fontSize: 48, color: 'warning.main', mb: 2 }} />
+            <Typography variant="h6" gutterBottom fontWeight="bold">
+              สรุปเนื้อหา
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              สรุปเนื้อหาจากวิดีโอด้วย AI (Gemini flash 2.0)
             </Typography>
           </Paper>
         </Grid>
