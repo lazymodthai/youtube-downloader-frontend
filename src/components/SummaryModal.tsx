@@ -243,13 +243,15 @@ const SummaryModal: React.FC<SummaryModalProps> = ({
                       </Stack>
                       <List dense disablePadding>
                         {paper.keyFindings.map((finding, fIndex) => (
-                          <ListItem key={fIndex} sx={{ py: 0.5, px: 0 }}>
-                            <ListItemIcon sx={{ minWidth: 28 }}>
+                          <ListItem key={fIndex} sx={{ py: 0.5, px: 0, alignItems: 'flex-start' }}>
+                            <ListItemIcon sx={{ minWidth: 28, mt: 0.5 }}>
                               <CheckCircleIcon color="success" sx={{ fontSize: 16 }} />
                             </ListItemIcon>
                             <ListItemText
-                              primary={finding}
-                              primaryTypographyProps={{ variant: 'body2' }}
+                              primary={finding.title}
+                              secondary={finding.description}
+                              primaryTypographyProps={{ variant: 'body2', fontWeight: 'bold' }}
+                              secondaryTypographyProps={{ variant: 'body2' }}
                             />
                           </ListItem>
                         ))}

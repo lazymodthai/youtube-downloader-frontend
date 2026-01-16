@@ -213,13 +213,27 @@ export const exportSummaryToDocx = async (summary: SummaryResponse): Promise<voi
                 color: '4CAF50',
               }),
               new TextRun({
-                text: finding,
+                text: finding.title,
+                bold: true,
                 size: 28,
+                color: '333333',
+              }),
+            ],
+            spacing: { after: 40 },
+            indent: { left: 300 },
+          })
+        );
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: finding.description,
+                size: 26,
                 color: '666666',
               }),
             ],
-            spacing: { after: 80 },
-            indent: { left: 300 },
+            spacing: { after: 120 },
+            indent: { left: 500 },
           })
         );
       });
