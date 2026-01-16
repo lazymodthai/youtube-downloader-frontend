@@ -55,7 +55,7 @@ const YouTubeDownloader: React.FC = () => {
   const [summaryLoading, setSummaryLoading] = useState<boolean>(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
 
-  const backendUrl = 'http://localhost:4000';
+  const backendUrl = `http://${window.location.hostname}:4000`;
 
   const formatDuration = (seconds: number): string => {
     const hrs = Math.floor(seconds / 3600);

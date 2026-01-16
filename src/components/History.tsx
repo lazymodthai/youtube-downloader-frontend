@@ -41,7 +41,7 @@ const History: React.FC = () => {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
 
-  const backendUrl = 'http://localhost:4000';
+  const backendUrl = `http://${window.location.hostname}:4000`;
 
   const fetchHistory = async () => {
     setLoading(true);
