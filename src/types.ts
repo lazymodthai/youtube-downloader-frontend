@@ -58,12 +58,20 @@ export interface SummaryHistory {
   id: number;
   video_url: string;
   video_title: string;
-  summary: string; // This is a JSON string of SummaryResponse
+  video_author: string;
+  video_duration: number;
+  conclusion: string;
+  market_highlights: MarketHighlight[];
+  papers: Paper[];
+  transcript_length: number;
+  transcript_source: string;
   created_at: string;
 }
 
 export interface SummaryHistoryResponse {
   total: number;
+  limit: number;
+  offset: number;
   data: SummaryHistory[];
 }
 

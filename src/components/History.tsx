@@ -41,7 +41,7 @@ const History: React.FC = () => {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
 
-  const backendUrl = 'http://192.168.20.72:4000';
+  const backendUrl = 'http://localhost:4000';
 
   const fetchHistory = async () => {
     setLoading(true);
@@ -72,21 +72,32 @@ const History: React.FC = () => {
     setPage(0);
   };
 
-  const handleViewSummary = async (videoTitle: string) => {
+  const handleViewSummary = async (videoUrl: string) => {
     setSummaryModalOpen(true);
     setSummaryLoading(true);
     setSummaryError(null);
     setSelectedSummary(null);
 
     try {
-      // Find summary by video title in summaries endpoint
-      const response = await fetch(`${backendUrl}/summaries?limit=1&search=${encodeURIComponent(videoTitle)}`);
+      // Find summary by video URL in summaries endpoint
+      const response = await fetch(`${backendUrl}/summaries?limit=1&search=${encodeURIComponent(videoUrl)}`);
       if (!response.ok) throw new Error('ไม่สามารถดึงข้อมูลสรุปได้');
       const data = await response.json();
 
       if (data.data && data.data.length > 0) {
-        const summaryObj = JSON.parse(data.data[0].summary);
-        setSelectedSummary(summaryObj);
+        const item = data.data[0];
+        // Map snake_case from API to camelCase for SummaryModal
+        const mappedSummary: SummaryResponse = {
+          title: item.video_title,
+          author: item.video_author,
+          duration: item.video_duration,
+          marketHighlights: item.market_highlights,
+          papers: item.papers,
+          conclusion: item.conclusion,
+          transcriptLength: item.transcript_length,
+          transcriptSource: item.transcript_source,
+        };
+        setSelectedSummary(mappedSummary);
       } else {
         throw new Error('ไม่พบข้อมูลสรุปสำหรับวิดีโอนี้');
       }
@@ -199,11 +210,12 @@ const History: React.FC = () => {
                     )}
                   </TableCell>
                   <TableCell align="center">
-                    {log.endpoint === '/summarize' && log.status === 'success' && (
+                    {log.status === 'success' && (
                       <IconButton
                         color="secondary"
                         size="small"
-                        onClick={() => handleViewSummary(log.video_title)}
+                        onClick={() => handleViewSummary(log.video_url)}
+                        title="ดูสรุปเนื้อหา"
                       >
                         <AutoAwesomeIcon />
                       </IconButton>
