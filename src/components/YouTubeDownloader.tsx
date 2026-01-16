@@ -28,7 +28,10 @@ import {
   Person as PersonIcon,
   Timer as TimerIcon,
   Visibility as VisibilityIcon,
+  AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
+import SummaryModal from './SummaryModal';
+import type { SummaryResponse } from '../types';
 
 interface VideoInfo {
   title: string;
@@ -46,13 +49,19 @@ const YouTubeDownloader: React.FC = () => {
   const [downloadFormat, setDownloadFormat] = useState<'video' | 'audio'>('video');
   const [downloadProgress, setDownloadProgress] = useState<string>('');
 
+  // Summary states
+  const [summaryModalOpen, setSummaryModalOpen] = useState<boolean>(false);
+  const [summaryData, setSummaryData] = useState<SummaryResponse | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState<boolean>(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+
   const backendUrl = 'http://192.168.20.72:4000';
 
   const formatDuration = (seconds: number): string => {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    
+
     if (hrs > 0) {
       return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
@@ -153,15 +162,55 @@ const YouTubeDownloader: React.FC = () => {
     }
   };
 
+  const handleSummarize = async () => {
+    if (!videoLink.trim()) {
+      setError('กรุณาใส่ลิงก์วิดีโอ YouTube');
+      return;
+    }
+
+    setSummaryModalOpen(true);
+    setSummaryLoading(true);
+    setSummaryError(null);
+    setSummaryData(null);
+
+    try {
+      const response = await fetch(`${backendUrl}/summarize`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ videoLink }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'เกิดข้อผิดพลาด');
+      }
+
+      const data = await response.json();
+      setSummaryData(data);
+    } catch (err: any) {
+      setSummaryError(err.message || 'ไม่สามารถสร้างสรุปเนื้อหาได้');
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
+  const handleCloseSummary = () => {
+    setSummaryModalOpen(false);
+    setSummaryData(null);
+    setSummaryError(null);
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Header */}
       <Box sx={{ textAlign: 'center', mb: 4 }}>
         <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} mb={2}>
           <DownloadIcon sx={{ fontSize: 48, color: 'error.main' }} />
-          <Typography 
-            variant="h3" 
-            component="h1" 
+          <Typography
+            variant="h3"
+            component="h1"
             fontWeight="bold"
             sx={{
               background: 'linear-gradient(45deg, #f44336 30%, #e91e63 90%)',
@@ -202,7 +251,7 @@ const YouTubeDownloader: React.FC = () => {
             onClick={handleFetchInfo}
             disabled={loading || !videoLink}
             startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <InfoIcon />}
-            sx={{ 
+            sx={{
               minWidth: { xs: '100%', md: 150 },
               height: 56,
               whiteSpace: 'nowrap'
@@ -221,7 +270,7 @@ const YouTubeDownloader: React.FC = () => {
 
         {/* Progress Alert */}
         {downloadProgress && (
-          <Alert 
+          <Alert
             severity={downloadProgress.includes('สำเร็จ') ? 'success' : 'info'}
             icon={downloadProgress.includes('สำเร็จ') ? <CheckCircleIcon /> : <CircularProgress size={20} />}
             sx={{ mb: 3 }}
@@ -245,23 +294,23 @@ const YouTubeDownloader: React.FC = () => {
                   {videoInfo.title}
                 </Typography>
                 <Stack direction="row" spacing={2} flexWrap="wrap" gap={1}>
-                  <Chip 
-                    icon={<PersonIcon />} 
-                    label={videoInfo.author} 
-                    color="primary" 
-                    variant="outlined" 
+                  <Chip
+                    icon={<PersonIcon />}
+                    label={videoInfo.author}
+                    color="primary"
+                    variant="outlined"
                   />
-                  <Chip 
-                    icon={<TimerIcon />} 
-                    label={formatDuration(videoInfo.lengthSeconds)} 
-                    color="secondary" 
-                    variant="outlined" 
+                  <Chip
+                    icon={<TimerIcon />}
+                    label={formatDuration(videoInfo.lengthSeconds)}
+                    color="secondary"
+                    variant="outlined"
                   />
-                  <Chip 
-                    icon={<VisibilityIcon />} 
-                    label={`${formatViews(videoInfo.viewCount)} views`} 
-                    color="info" 
-                    variant="outlined" 
+                  <Chip
+                    icon={<VisibilityIcon />}
+                    label={`${formatViews(videoInfo.viewCount)} views`}
+                    color="info"
+                    variant="outlined"
                   />
                 </Stack>
               </CardContent>
@@ -277,7 +326,7 @@ const YouTubeDownloader: React.FC = () => {
               <ToggleButtonGroup
                 value={downloadFormat}
                 exclusive
-                onChange={(e, newFormat) => {
+                onChange={(_, newFormat) => {
                   if (newFormat !== null) {
                     setDownloadFormat(newFormat);
                   }
@@ -338,7 +387,7 @@ const YouTubeDownloader: React.FC = () => {
                   onClick={() => handleDownload('fast')}
                   disabled={loading}
                   startIcon={<FlashOnIcon />}
-                  sx={{ 
+                  sx={{
                     py: 2,
                     background: 'linear-gradient(45deg, #9c27b0 30%, #e91e63 90%)',
                     '&:hover': {
@@ -347,6 +396,29 @@ const YouTubeDownloader: React.FC = () => {
                   }}
                 >
                   ดาวน์โหลดแบบเร็ว
+                </Button>
+              </Grid>
+              <Grid size={12}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  size="large"
+                  onClick={handleSummarize}
+                  disabled={loading || summaryLoading}
+                  startIcon={summaryLoading ? <CircularProgress size={20} /> : <AutoAwesomeIcon />}
+                  sx={{
+                    py: 2,
+                    borderWidth: 2,
+                    borderColor: '#667eea',
+                    color: '#667eea',
+                    '&:hover': {
+                      borderWidth: 2,
+                      borderColor: '#764ba2',
+                      background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+                    }
+                  }}
+                >
+                  {summaryLoading ? 'กำลังสร้างสรุป...' : 'สรุปเนื้อหา'}
                 </Button>
               </Grid>
             </Grid>
@@ -390,6 +462,15 @@ const YouTubeDownloader: React.FC = () => {
           </Paper>
         </Grid>
       </Grid>
+
+      {/* Summary Modal */}
+      <SummaryModal
+        open={summaryModalOpen}
+        onClose={handleCloseSummary}
+        summary={summaryData}
+        loading={summaryLoading}
+        error={summaryError}
+      />
     </Container>
   );
 };
